@@ -15,7 +15,7 @@ if { [info exists ::env(TCLLIBPATH) ] } {
 	exit
     }
 } else {
-    # Environment variable does not find XP_TCLJAVA_INSTALL_DIR -> no TclBlend
+    # Environment variable does not find TCLLIBPATH -> no TclBlend/jtclsh
     # Now try to check TclJBlend
     if {[catch {package require JBlend}]} {
         puts "Failed loading package TclJBlend, exit."
