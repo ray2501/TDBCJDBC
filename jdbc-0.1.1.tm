@@ -497,7 +497,7 @@ java::import java.io.StringReader
             # just give a default value.
             if {[string index $token 0] in {$ : @}} {
                 dict set Params [string range $token 1 end] \
-                    {type varchar precision 0 scale 0 nullable 2 direction in}
+                    {type varchar direction in}
 
                 append sql "?"
                 continue
@@ -580,40 +580,9 @@ java::import java.io.StringReader
                           varbinary longvarbinary blob}} {
                 dict set value type $type
             }
-
-            incr count 1
         }
 
-        if {$length > $count} {
-            set precision [lindex $args $count]
-
-            # But I don't know how to set and get precision
-            dict set value precision 0
-            incr count 1
-        } else {
-            dict set value precision 0
-        }
-
-        if {$length > $count} {
-            set scale [lindex $args $count]
-
-            # But I don't know how to set and get scale
-            dict set value scale 0
-            incr count 1
-        } else {
-            dict set value scale 0
-        }
-
-        if {$length > $count} {
-            set nullable [lindex $args $count]
-            if {$nullable in {0 1 2} } {
-                # I don't know how to set and get nullable value
-                dict set value type 2
-            }
-        } else {
-            dict set value nullable 2
-        }
-
+        # Skip other parameters and setup
         dict set Params $parameter $value
 
     }
