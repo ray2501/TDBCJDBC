@@ -564,6 +564,10 @@ I just test Apache Drill JDBC driver in distributed mode. And I use
 `setUsePrepared` method (setup flag to 0) to use Statement to replace
 prepareStatement.
 
+I enable [User Authentication] (https://drill.apache.org/docs/configuring-user-authentication/)
+to test Apache Drill JDBC driver. So if you use TDBCJDBC to connect Apache Drill,
+please remember to update url, username and password.
+
 Apache Drill provides sample data, try it:
 
     package require tdbc::jdbc
