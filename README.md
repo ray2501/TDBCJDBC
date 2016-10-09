@@ -554,3 +554,39 @@ prepareStatement.
 
     db close
 
+## Example: Apache Drill
+
+[Apache Drill] (https://drill.apache.org/) is a low-latency distributed query
+engine for large-scale datasets, including structured and semi-structured/nested
+data.
+
+I just test Apache Drill JDBC driver in distributed mode. And I use
+`setUsePrepared` method (setup flag to 0) to use Statement to replace
+prepareStatement.
+
+Apache Drill provides sample data, try it:
+
+    package require tdbc::jdbc
+
+    set className    {org.apache.drill.jdbc.Driver}
+    set url          jdbc:drill:zk=192.168.2.103:2181/drill/drillbits1
+    set username     "danilo"
+    set password     "danilo"
+
+    tdbc::jdbc::connection create db $className $url $username $password
+
+    # Only for test: use Statement to replace prepareStatement
+    db setUsePrepared 0
+
+    set statement [db prepare {SELECT * FROM cp.`employee.json` LIMIT 5}]
+    $statement foreach row {
+        puts "=================="
+        foreach {key value} $row {
+            puts "$key - $value"
+        }
+    }
+
+    $statement close
+
+    db close
+
