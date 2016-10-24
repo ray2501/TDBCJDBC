@@ -64,7 +64,7 @@ java::import java.io.StringReader
     variable ConnectionI DatabaseMetaDataI
     variable isolation
     variable readonly
-    variable tranaacion
+    variable transaction
     variable useprepared
 
     constructor {className url username password args} {
@@ -89,7 +89,7 @@ java::import java.io.StringReader
         }
 
         # for internal use
-        set tranaacion [dict create \
+        set transaction [dict create \
             1 readuncommitted \
             2 readcommitted \
             4 repeatableread \
@@ -112,7 +112,7 @@ java::import java.io.StringReader
     method configure args {
         if {[llength $args] == 0} {
             set result -isolation
-            lappend result [dict get $tranaacion $isolation]
+            lappend result [dict get $transaction $isolation]
             lappend result -readonly $readonly
             return $result
         } elseif {[llength $args] == 1} {
@@ -120,7 +120,7 @@ java::import java.io.StringReader
             switch -exact -- $option {
                 -i - -is - -iso - -isol - -isola - -isolat - -isolati -
                 -isolatio - -isolation {
-                    return [dict get $tranaacion $isolation]
+                    return [dict get $transaction $isolation]
                 }
                 -r - -re - -rea - -read - -reado - -readon - -readonl -
                 -readonly {
