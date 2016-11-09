@@ -434,6 +434,54 @@ Below is an exmaple:
 
     db close
 
+## Example: TiDB
+
+TiDB is a distributed NewSQL database compatible with MySQL protocol.
+I download [MySQL JDBC driver] (https://dev.mysql.com/downloads/connector/j/) to test TiDB.
+
+    package require tdbc::jdbc
+
+    set className    {com.mysql.jdbc.Driver}
+    set url          jdbc:mysql://localhost:4000/test?useSSL=true
+    set username     "root"
+    set password     ""
+
+    tdbc::jdbc::connection create db $className $url $username $password
+
+    set statement [db prepare \
+        {create table contact (name varchar(20) not null  UNIQUE, 
+        email varchar(40) not null, primary key(name))}]
+    $statement execute
+    $statement close
+
+    set statement [db prepare {insert into contact values(:name, :email)}]
+    $statement paramtype name varchar
+    $statement paramtype email varchar
+
+    set name danilo
+    set email danilo@test.com
+    $statement execute
+
+    set name scott
+    set email scott@test.com
+    $statement execute
+
+    set myparams [dict create name arthur email arthur@example.com]
+    $statement execute $myparams
+    $statement close
+
+    set statement [db prepare {SELECT * FROM contact}]
+    $statement foreach row {
+        puts [dict get $row name]
+        puts [dict get $row email]
+    }
+    $statement close
+
+    set statement [db prepare {DROP TABLE  contact}]
+    $statement execute
+    $statement close
+    db close
+
 ## Example: CUBRID
 
 I create a `demo` database to test CUBRID 10.0
