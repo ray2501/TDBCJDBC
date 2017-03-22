@@ -3,19 +3,19 @@ TDBCJDBC
 
 It is unofficial Tcl DataBase Connectivity JDBC Driver.
 
-[Tcl Database Connectivity (TDBC)] (http://www.tcl.tk/man/tcl8.6/TdbcCmd/tdbc.htm)
+[Tcl Database Connectivity (TDBC)](http://www.tcl.tk/man/tcl8.6/TdbcCmd/tdbc.htm)
 is a common interface for Tcl programs to access SQL databases.
 
-[tclBlend] (http://tcljava.sourceforge.net/docs/website/index.html) is a Tcl package
-that provides access to Java classes from Tcl. tclBlend is implemented using
-[JNI] (https://en.wikipedia.org/wiki/Java_Native_Interface).
+[tclBlend](http://tcljava.sourceforge.net/docs/website/index.html) is a Tcl package
+that provides access to Java classes from Tcl. tclBlend is implemented using 
+[JNI](https://en.wikipedia.org/wiki/Java_Native_Interface).
 
-[tclJBlend] (http://wiki.tcl.tk/47668) is a fork of TclBlend, a Tcl extension that
+[tclJBlend](http://wiki.tcl.tk/47668) is a fork of TclBlend, a Tcl extension that
 uses JNI to communicate with a Java interpreter.
 
-[Java Database Connectivity (JDBC)] (https://en.wikipedia.org/wiki/Java_Database_Connectivity) provides methods to query and update data in a database, and is oriented towards relational databases.
+[Java Database Connectivity (JDBC)](https://en.wikipedia.org/wiki/Java_Database_Connectivity) provides methods to query and update data in a database, and is oriented towards relational databases.
 
-The library consists of a single [Tcl Module] (http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file.
+The library consists of a single [Tcl Module](http://tcl.tk/man/tcl8.6/TclCmd/tm.htm#M9) file.
 TDBC::JDBC extension is using tclBlend package to call JDBC API.
 
 The tdbc::jdbc driver provides a database interface that conforms to Tcl DataBase Connectivity (TDBC)
@@ -27,7 +27,7 @@ Windows platform (32bit and 64bit) and JDK8.
 
 This extension needs Tcl >= 8.6, TDBC and tclBlend (or tclJBlend) package.
 Tcl 8.6.1-8.6.5 maybe need patch, please
-check [tclBlend] (http://wiki.tcl.tk/1313).
+check [tclBlend](http://wiki.tcl.tk/1313).
 
 
 License
@@ -96,7 +96,7 @@ Below is an example for HSQLDB (on Windows platform):
 
 ## Example: HSQLDB
 
-[HSQLDB] (http://hsqldb.org/) is a relational database management system written in Java.
+[HSQLDB](http://hsqldb.org/) is a relational database management system written in Java.
 It offers a fast, small database engine which offers both in-memory and
 disk-based tables. Both embedded and server modes are available for purchase.
 
@@ -157,7 +157,7 @@ Below is an exmaple:
 
 ## Example: H2 database
 
-[H2] (http://www.h2database.com/html/main.html) is a relational database management
+[H2](http://www.h2database.com/html/main.html) is a relational database management
 system written in Java. It can be embedded in Java applications or run in the
 client-server mode.
 
@@ -214,7 +214,7 @@ Below is an exmaple:
 
 ## Example: Apache Derby
 
-[Apache Derby] (https://db.apache.org/derby/) is developed as an open source
+[Apache Derby](https://db.apache.org/derby/) is developed as an open source
 project under the Apache 2.0 license. Oracle distributes the same binaries
 under the name `Java DB`.
 
@@ -289,7 +289,7 @@ Below is an exmaple:
 
 ## Example: PostgreSQL
 
-Download JDBC driver from [PostgreSQL JDBC Driver] (https://jdbc.postgresql.org/index.html). Below is a simple exmaple:
+Download JDBC driver from [PostgreSQL JDBC Driver](https://jdbc.postgresql.org/index.html). Below is a simple exmaple:
 
     package require tdbc::jdbc
 
@@ -313,7 +313,7 @@ Download JDBC driver from [PostgreSQL JDBC Driver] (https://jdbc.postgresql.org/
 ## Example: MonetDB
 
 This example is only to test MonetDB
-[JDBC driver] (https://www.monetdb.org/Documentation/Manuals/SQLreference/Programming/JDBC).
+[JDBC driver](https://www.monetdb.org/Documentation/Manuals/SQLreference/Programming/JDBC).
 
 Below is an exmaple:
 
@@ -377,7 +377,7 @@ Below is an exmaple:
 
 ## Example: SQLite
 
-SQLite already have very good [Tcl interface] (https://www.sqlite.org/tclsqlite.html) and [TDBC driver] (http://www.tcl.tk/man/tcl8.6/TdbcsqliteCmd/tdbc_sqlite3.htm). This example is only to test [SQLite JDBC driver] (https://bitbucket.org/xerial/sqlite-jdbc).
+SQLite already have very good [Tcl interface](https://www.sqlite.org/tclsqlite.html) and [TDBC driver](http://www.tcl.tk/man/tcl8.6/TdbcsqliteCmd/tdbc_sqlite3.htm). This example is only to test [SQLite JDBC driver](https://bitbucket.org/xerial/sqlite-jdbc).
 
 Below is an exmaple:
 
@@ -437,7 +437,7 @@ Below is an exmaple:
 ## Example: TiDB
 
 TiDB is a distributed NewSQL database compatible with MySQL protocol.
-I download [MySQL JDBC driver] (https://dev.mysql.com/downloads/connector/j/) to test TiDB.
+I download [MySQL JDBC driver](https://dev.mysql.com/downloads/connector/j/) to test TiDB.
 
     package require tdbc::jdbc
 
@@ -485,7 +485,7 @@ I download [MySQL JDBC driver] (https://dev.mysql.com/downloads/connector/j/) to
 ## Example: CUBRID
 
 I create a `demo` database to test CUBRID 10.0
-[JDBC Driver] (http://www.cubrid.org/manual/10_0/en/api/jdbc.html).
+[JDBC Driver](http://www.cubrid.org/manual/10_0/en/api/jdbc.html).
 
 Below is an exmaple:
 
@@ -541,7 +541,7 @@ Below is an exmaple:
 
 ## Example: Apache Phoenix
 
-[Apache Phoenix] (https://phoenix.apache.org/) offers a SQL skin on HBase.
+[Apache Phoenix](https://phoenix.apache.org/) offers a SQL skin on HBase.
 Phoenix is implemented as a JDBC driver.
 
 I just test Apache HBase 1.2.3 and Apache Phoenix 4.8.0 on Localhost. And I use
@@ -604,7 +604,7 @@ prepareStatement.
 
 ## Example: Apache Drill
 
-[Apache Drill] (https://drill.apache.org/) is a low-latency distributed query
+[Apache Drill](https://drill.apache.org/) is a low-latency distributed query
 engine for large-scale datasets, including structured and semi-structured/nested
 data.
 
@@ -612,7 +612,7 @@ I just test Apache Drill JDBC driver in distributed mode. And I use
 `setUsePrepared` method (setup flag to 0) to use Statement to replace
 prepareStatement.
 
-I enable [User Authentication] (https://drill.apache.org/docs/configuring-user-authentication/)
+I enable [User Authentication](https://drill.apache.org/docs/configuring-user-authentication/)
 to test Apache Drill JDBC driver. So if you use TDBCJDBC to connect Apache Drill,
 please remember to update url, username and password.
 
