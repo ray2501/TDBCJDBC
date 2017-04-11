@@ -54,6 +54,13 @@ For openSUSE (64bit), copy jdbc-0.1.1.tm this file to below location:
 
     /usr/lib64/tcl/tcl8/8.6/tdbc
 
+Or you can use installer.tcl to install this package.
+install.tcl use `info library` to get path and install tm file.
+If you want to uninstall after using install.tcl to install,
+try below comman:
+
+    sudo ./install.tcl -uninstall 1
+
 
 Commands
 =====
