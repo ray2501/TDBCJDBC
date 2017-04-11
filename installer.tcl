@@ -60,4 +60,20 @@ if {[file exists $path]} {
   }
 } else {
   puts "Path does not exist!!!"
+  puts "Now try to use mkdir..."
+  if {[catch {file mkdir $path} errMsg]} {
+    puts $errMsg
+  } else {
+    puts "Done."
+    if {[file exists $tmfile]} {
+      puts "Now copy tm file $tmfile..."
+      if {[catch {file copy -force $tmfile $path} errMsg]} {
+        puts $errMsg
+      } else {
+        puts "Done."
+      }
+    } else {
+      puts "Sory, $tmfile does not exist!!!"
+    }
+  }
 }
