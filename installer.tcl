@@ -27,7 +27,7 @@ if {$argc > 0 && [llength $argv] % 2 eq 0} {
     }
   }
 } elseif {[llength $argv] % 2 eq 1} {
-  puts "Parameters is not correct, close..."
+  puts "Parameters are not correct, close..."
   exit
 }
 
@@ -55,7 +55,7 @@ if {[file exists $path]} {
         puts "Done."
       }
     } else {    
-      puts "Sory, $tmfile does not exist!!!"
+      puts "Sorry, $tmfile does not exist!!!"
     }
   }
 } else {
@@ -73,7 +73,7 @@ if {[file exists $path]} {
         puts "Done."
       }
     } else {
-      puts "Sory, $tmfile does not exist!!!"
+      puts "Sorry, $tmfile does not exist!!!"
     }
   }
 }
