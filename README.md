@@ -496,7 +496,7 @@ I download [MySQL JDBC driver](https://dev.mysql.com/downloads/connector/j/) to 
 ## Example: CUBRID
 
 I create a `demo` database to test CUBRID 10.0
-[JDBC Driver](http://www.cubrid.org/manual/10_0/en/api/jdbc.html).
+[JDBC Driver](http://cubrid.org/manual/en/10.0/api/jdbc.html).
 
 Below is an exmaple:
 
