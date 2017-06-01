@@ -653,3 +653,38 @@ Apache Drill provides sample data, try it:
 
     db close
 
+## Example: CrateDB
+
+[CrateDB](https://crate.io/) is a distributed SQL database management system that
+integrates a fully searchable document oriented data store.
+
+The JDBC driver is from [CrateDB JDBC](https://crate.io/docs/clients/jdbc/) and
+test at CrateDB 1.1.3.  CrateDB is still under development, so maybe the
+interface would be changed in the future.
+
+    package require tdbc::jdbc
+
+    set className    {io.crate.client.jdbc.CrateDriver}
+    set url          crate://localhost:5432/
+    set username     ""
+    set password     ""
+
+    if {[catch {tdbc::jdbc::connection create db $className $url $username $password -readonly 0} errMsg]} {
+        puts $errMsg
+        exit
+    }
+
+    set statement [db prepare {select name from sys.cluster}]
+
+    $statement foreach row {
+        if {[catch {set name [dict get $row name]}]} {
+            puts "name:"
+        } else {
+            puts "name: $name"
+        }
+    }
+
+    $statement close
+
+    db close
+
