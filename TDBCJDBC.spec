@@ -1,5 +1,5 @@
 #
-# spec file for package TDBDJDBC
+# spec file for package TDBCJDBC
 #
 
 Name:           TDBCJDBC
