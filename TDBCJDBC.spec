@@ -37,6 +37,9 @@ package ifneeded tdbc::jdbc 0.1.1 \
     [list source [file join $dir tdbc jdbc-0.1.1.tm]]
 EOD
 
+%clean
+rm -rf %{buildroot}
+
 %files
 %defattr(-,root,root)
 %doc README.md
