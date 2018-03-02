@@ -34,7 +34,7 @@ cat > %{buildroot}%{tcl_noarchdir}/%{name}%{version}/pkgIndex.tcl << 'EOD'
 # Tcl package index file
 #
 package ifneeded tdbc::jdbc 0.1.1 \
-    [list source [file join $dir tdbc jdbc-0.1.1.tm]]
+    [list source [file join tdbc jdbc-0.1.1.tm]]
 EOD
 
 %files
