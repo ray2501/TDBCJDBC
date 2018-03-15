@@ -688,3 +688,38 @@ interface would be changed in the future.
 
     db close
 
+## Example: Neo4j
+
+[Neo4j](https://neo4j.com/) is a graph database management system developed by Neo4j, Inc.
+
+I test [Neo4j JDBC driver for Neo4j 3.x with BOLT protocol](https://github.com/neo4j-contrib/neo4j-jdbc)
+by using Neo4j 3.3.3. And I use `setUsePrepared` method (setup flag to 0) to use Statement to replace
+prepareStatement (Neo4j use [Cypher language](https://neo4j.com/docs/developer-manual/current/cypher/),
+not SQL).
+
+    package require tdbc::jdbc
+
+    set className    {org.neo4j.jdbc.Neo4jDriver}
+    set url          jdbc:neo4j:bolt://localhost
+    set username     "neo4j"
+    set password     "neo4j123"
+    if {[catch {tdbc::jdbc::connection create db $className $url $username $password -readonly 0} errMsg]} {
+        puts $errMsg
+        exit
+    }
+
+    db setUsePrepared 0
+    set statement [db prepare {MATCH (person: Person) RETURN person}]
+
+    $statement foreach row {
+        if {[catch {set person [dict get $row person]}]} {
+            puts "person:"
+        } else {
+            puts "person: $person"
+        }
+    }
+
+    $statement close
+
+    db close
+
