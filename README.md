@@ -445,6 +445,53 @@ Below is an exmaple:
 
     db close
 
+## Example: MariaDB
+
+I download [MariaDB JDBC driver](https://downloads.mariadb.org/connector-java/) to test.
+
+    package require tdbc::jdbc
+
+    set className    {org.mariadb.jdbc.Driver}
+    set url          jdbc:mariadb://localhost:3306/test
+    set username     "root"
+    set password     "admin"
+
+    tdbc::jdbc::connection create db $className $url $username $password
+
+    set statement [db prepare \
+        {create table if not exists contact (name varchar(20) not null  UNIQUE, 
+        email varchar(40) not null, primary key(name))}]
+    $statement execute
+    $statement close
+
+    set statement [db prepare {insert into contact values(:name, :email)}]
+    $statement paramtype name varchar
+    $statement paramtype email varchar
+
+    set name scott
+    set email scott@test.com
+    $statement execute
+
+    set name danilo
+    set email danilo@test.com
+    $statement execute
+
+    set myparams [dict create name arthur email arthur@example.com]
+    $statement execute $myparams
+    $statement close
+
+    set statement [db prepare {SELECT * FROM contact}]
+    $statement foreach row {
+        puts [dict get $row name]
+        puts [dict get $row email]
+    }
+    $statement close
+
+    set statement [db prepare {DROP TABLE if exists contact}]
+    $statement execute
+    $statement close
+    db close
+
 ## Example: TiDB
 
 TiDB is a distributed NewSQL database compatible with MySQL protocol.
