@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 #
-#	Tcl DataBase Connectivity JDBC Driver
-#	Class definitions and Tcl-level methods for the tdbc::jdbc bridge.
+#       Tcl DataBase Connectivity JDBC Driver
+#       Class definitions and Tcl-level methods for the tdbc::jdbc bridge.
 #
 #------------------------------------------------------------------------------
 
@@ -53,7 +53,7 @@ java::import java.io.StringReader
 #
 # tdbc::jdbc::connection --
 #
-#	Class representing a connection to a jdbc database.
+#       Class representing a connection to a jdbc database.
 #
 #-------------------------------------------------------------------------------
 
@@ -73,19 +73,48 @@ java::import java.io.StringReader
         if {[llength $args] % 2 != 0} {
             set cmd [lrange [info level 0] 0 end-[llength $args]]
             return -code error \
-            -errorcode {TDBC GENERAL_ERROR HY000 JDBC WRONGNUMARGS} \
-            "wrong # args, should be \"$cmd ?-option value?...\""
+                -errorcode {TDBC GENERAL_ERROR HY000 JDBC WRONGNUMARGS} \
+                "wrong # args, should be \"$cmd ?-option value?...\""
+        }
+
+        # required magic for AndroWish: needs investigation
+        catch { java::load $className }
+
+        catch {
+            # Android: use Context.getClassLoader().loadClass()
+            java::try {
+                set ctx [java::call tk.tcl.wish.AndroWish getContext]
+                set ldr [$ctx getClassLoader]
+                set cls [$ldr loadClass $className]
+            } catch {Exception ex} {
+                # nothing
+            } finally {
+                unset -nocomplain ldr
+                unset -nocomplain ctx
+            }
+        }
+
+        if {![info exists cls]} {
+            # Normal JVM: use Class.forName()
+            java::try {
+                java::call Class forName $className
+            } catch {Exception ex} {
+                # nothing
+            }
         }
 
         java::try {
-            java::call Class forName $className
-            set ConnectionI [ java::call DriverManager getConnection $url $username $password ]
+            set ConnectionI [java::call DriverManager getConnection $url $username $password]
         } catch {TclException ex} {
-            error "a Tcl error occurred"
+            error "tcl error: [$ex toString]"
         } catch {ClassNotFoundException ex} {
-            error "catch ClassNotFoundException, please check CLASSPATH"
+            error "ClassNotFoundException: [$ex toString]"
         } catch {SQLException ex} {
-            error "catch SQLException, Connection fail"
+            error "SQLException: [$ex toString]"
+        } catch {Exception ex} {
+            error "Exception: [$ex toString]"
+        } finally {
+            unset -nocomplain cls
         }
 
         # for internal use
@@ -96,8 +125,8 @@ java::import java.io.StringReader
             8 serializable]
 
         set DatabaseMetaDataI {}
-        set isolation [ $ConnectionI getTransactionIsolation ]
-        set readonly  [ $ConnectionI isReadOnly ]
+        set isolation [$ConnectionI getTransactionIsolation]
+        set readonly  [$ConnectionI isReadOnly]
         set useprepared 1
 
         if {[llength $args] > 0} {
@@ -128,18 +157,18 @@ java::import java.io.StringReader
                 }
                 default {
                     return -code error \
-                    -errorcode [list TDBC GENERAL_ERROR HY000 JDBC \
+                        -errorcode [list TDBC GENERAL_ERROR HY000 JDBC \
                             BADOPTION $option] \
-                    "bad option \"$option\": must be -isolation or -readonly"
+                        "bad option \"$option\": must be -isolation or -readonly"
 
                 }
             }
         } elseif {[llength $args] % 2 != 0} {
             set cmd [lrange [info level 0] 0 end-[llength $args]]
             return -code error \
-            -errorcode [list TDBC GENERAL_ERROR HY000 \
+                -errorcode [list TDBC GENERAL_ERROR HY000 \
                     JDBC WRONGNUMARGS] \
-            "wrong # args, should be \" $cmd ?-option value?...\""
+                "wrong # args, should be \"$cmd ?-option value?...\""
         }
 
         foreach {option value} $args {
@@ -151,48 +180,45 @@ java::import java.io.StringReader
                     readuncomm - readuncommi - readuncommit -
                     readuncommitt - readuncommitte - readuncommitted {
                         $ConnectionI setTransactionIsolation 1
-                        set isolation [ $ConnectionI getTransactionIsolation ]
+                        set isolation [$ConnectionI getTransactionIsolation]
                     }
                     readc - readco - readcom - readcomm - readcommi -
                     readcommit - readcommitt - readcommitte -
                     readcommitted {
                         $ConnectionI setTransactionIsolation 2
-                        set isolation [ $ConnectionI getTransactionIsolation ]
+                        set isolation [$ConnectionI getTransactionIsolation]
                     }
                     rep - repe - repea - repeat - repeata - repeatab -
                     repeatabl - repeatable - repeatabler - repeatablere -
                     repeatablerea - repeatablread {
                         $ConnectionI setTransactionIsolation 4
-                        set isolation [ $ConnectionI getTransactionIsolation ]
+                        set isolation [$ConnectionI getTransactionIsolation]
                     }
                     s - se - ser - seri - seria - serial - seriali -
                     serializ - serializa - serializab - serializabl -
                     serializable -
                     reado - readon - readonl - readonly {
                         $ConnectionI setTransactionIsolation 8
-                        set isolation [ $ConnectionI getTransactionIsolation ]
+                        set isolation [$ConnectionI getTransactionIsolation]
                     }
                     default {
                         return -code error \
-                        -errorcode [list TDBC GENERAL_ERROR HY000 \
+                             -errorcode [list TDBC GENERAL_ERROR HY000 \
                                 JDBC BADISOLATION $value] \
-                        "bad isolation level \"$value\":\
-                                        should be readuncommitted, readcommitted,\
-                                        repeatableread, serializable, or readonly"
+                            "bad isolation level \"$value\": should be readuncommitted, readcommitted, repeatableread, serializable, or readonly"
                     }
                     }
                 }
                 -r - -re - -rea - -read - -reado - -readon - -readonl -
                 -readonly {
                     $ConnectionI setReadOnly $value
-                    set readonly  [ $ConnectionI isReadOnly ]
+                    set readonly  [$ConnectionI isReadOnly]
                 }
                 default {
                     return -code error \
-                    -errorcode [list TDBC GENERAL_ERROR HY000 \
+                        -errorcode [list TDBC GENERAL_ERROR HY000 \
                             JDBC BADOPTION $value] \
-                    "bad option \"$option\": must be\
-                                 -isolation or -readonly"
+                        "bad option \"$option\": must be -isolation or -readonly"
                 }
             }
         }
@@ -217,10 +243,10 @@ java::import java.io.StringReader
     method tables {{pattern %}} {
         set retval {}
 
-        set DatabaseMetaDataI [ $ConnectionI getMetaData ]
-        set result [ $DatabaseMetaDataI getTables [java::null] [java::null] $pattern [java::null] ]
+        set DatabaseMetaDataI [$ConnectionI getMetaData]
+        set result [$DatabaseMetaDataI getTables [java::null] [java::null] $pattern [java::null]]
 
-        while { [$result next]} {
+        while { [$result next] } {
             set row [dict create]
             dict set row "TABLE_CAT" [$result getString "TABLE_CAT"]
             dict set row "TABLE_SCHEM" [$result getString "TABLE_SCHEM"]
@@ -280,9 +306,9 @@ java::import java.io.StringReader
     method primarykeys {table} {
         set retval {}
 
-        set DatabaseMetaDataI [ $ConnectionI getMetaData ]
+        set DatabaseMetaDataI [$ConnectionI getMetaData]
         set result [$DatabaseMetaDataI getPrimaryKeys [java::null] [java::null] $table]
-        while { [$result next]} {
+        while { [$result next] } {
             set row [dict create]
             dict set row "TABLE_CAT" [$result getString "TABLE_CAT"]
             dict set row "TABLE_SCHEM" [$result getString "TABLE_SCHEM"]
@@ -301,28 +327,28 @@ java::import java.io.StringReader
         set length [llength $args]
         set ftable ""
 
-        if { $length != 2 || $length%2 != 0} {
+        if { $length != 2 || $length%2 != 0 } {
+            set cmd [lrange [info level 0] 0 1]
             return -code error \
-            -errorcode [list TDBC GENERAL_ERROR HY000 \
+                -errorcode [list TDBC GENERAL_ERROR HY000 \
                     JDBC WRONGNUMARGS] \
-            "wrong # args: should be \
-             [lrange [info level 0] 0 1] -foreign tableName"
+                "wrong # args: should be \"$cmd -foreign tableName\""
 
             return $retval
         }
 
         foreach {key table} $args {
-            if {[string compare $key "-foreign"]==0} {
+            if {[string compare $key "-foreign"] == 0} {
                 set ftable $table
             } else {
                 return $retval
             }
         }
 
-        set DatabaseMetaDataI [ $ConnectionI getMetaData ]
+        set DatabaseMetaDataI [$ConnectionI getMetaData]
         set result [$DatabaseMetaDataI getImportedKeys [java::null] [java::null] $ftable]
 
-        while { [$result next]} {
+        while { [$result next] } {
             set row [dict create]
             set fktable [$result getString "FKTABLE_NAME"]
             set fkschem [$result getString "FKTABLE_SCHEM"]
@@ -333,60 +359,48 @@ java::import java.io.StringReader
             set pkcolumn [$result getString "PKCOLUMN_NAME"]
 
 
-            if {[string compare $ftable $fktable]==0} {
+            if {[string compare $ftable $fktable] == 0} {
 
-                if { [catch {dict get $retval foreignTable}]} {
-                   set vallist [list $fktable]
-                } else {
-                   if {$fktable ni $vallist} {
-                       lappend vallist $fktable
-                   }
+                if {[dict exists $retval foreignTable]} {
+                    set vallist [list $fktable]
+                } elseif {$fktable ni $vallist} {
+                    lappend vallist $fktable
                 }
                 dict set retval foreignTable $vallist
 
-                if { [catch {set vallist2 [dict get $retval foreignSchema]}]} {
-                   set vallist2 [list $fkschem]
-                } else {
-                   if {$fkschem ni $vallist2} {
-                       lappend vallist2 $fkschem
-                   }
+                if {[dict exists $retval foreignSchema]} {
+                    set vallist2 [list $fkschem]
+                } elseif {$fkschem ni $vallist2} {
+                    lappend vallist2 $fkschem
                 }
                 dict set retval foreignSchema $vallist2
 
-                if { [catch {set listval [dict get $retval foreignColumn]}]} {
-                   set listval [list $fkcolumn]
-                } else {
-                   if {$fkcolumn ni $listval} {
-                       lappend listval $fkcolumn
-                   }
+                if {[dict exists $retval foreignColumn]} {
+                    set listval [list $fkcolumn]
+                } elseif {$fkcolumn ni $listval} {
+                    lappend listval $fkcolumn
                 }
                 dict set retval foreignColumn $listval
 
                 # Get primary key info
-                if { [catch {set primaryvallist [dict get $retval primaryTable]}] } {
-                   set primaryvallist [list $pktable]
-                } else {
-                   if {$pktable ni $primaryvallist} {
-                       lappend primaryvallist $pktable
-                   }
+                if {[dict exists $retval primaryTable]} {
+                    set primaryvallist [list $pktable]
+                } elseif {$pktable ni $primaryvallist} {
+                    lappend primaryvallist $pktable
                 }
                 dict set retval primaryTable $primaryvallist
 
-                if { [catch {set primaryvallist2 [dict get $retval primarySchema]}]} {
-                   set primaryvallist2 [list $pkschem]
-                } else {
-                   if {$pkschem ni $primaryvallist2} {
-                       lappend primaryvallist2 $pkschem
-                   }
+                if {[dict exists $retval primarySchema]} {
+                    set primaryvallist2 [list $pkschem]
+                } elseif {$pkschem ni $primaryvallist2} {
+                    lappend primaryvallist2 $pkschem
                 }
                 dict set retval primarySchema $primaryvallist2
 
-                if { [catch {set primarylistval [dict get $retval primaryColumn]}]} {
-                   set primarylistval [list $pkcolumn]
-                } else {
-                   if {$pkcolumn ni $primarylistval} {
-                       lappend primarylistval $pkcolumn
-                   }
+                if {[dict exists $retval primaryColumn]} {
+                    set primarylistval [list $pkcolumn]
+                } elseif {$pkcolumn ni $primarylistval} {
+                    lappend primarylistval $pkcolumn
                 }
                 dict set retval primaryColumn $primarylistval
 
@@ -454,16 +468,16 @@ java::import java.io.StringReader
 
     # For debug use
     method getProductName {} {
-        set DatabaseMetaDataI [ $ConnectionI getMetaData ]
-        set productNmae [ $DatabaseMetaDataI getDatabaseProductName ]
-        return $productNmae
+        set DatabaseMetaDataI [$ConnectionI getMetaData]
+        set productName [$DatabaseMetaDataI getDatabaseProductName]
+        return $productName
     }
 
 
     # For debug use
     method getProductVersion {} {
-        set DatabaseMetaDataI [ $ConnectionI getMetaData ]
-        set productVersion [ $DatabaseMetaDataI getDatabaseProductVersion ]
+        set DatabaseMetaDataI [$ConnectionI getMetaData]
+        set productVersion [$DatabaseMetaDataI getDatabaseProductVersion]
         return $productVersion
     }
 
@@ -474,7 +488,7 @@ java::import java.io.StringReader
 #
 # tdbc::jdbc::statement --
 #
-#	The class 'tdbc::jdbc::statement' models one statement against a
+#       The class 'tdbc::jdbc::statement' models one statement against a
 #       database accessed through a jdbc connection
 #
 #------------------------------------------------------------------------------
@@ -490,7 +504,7 @@ java::import java.io.StringReader
         set Params {}
         set ConnectionI [$connection getDBhandle]
         set sql {}
-        set useprepared [$connection getUsePrepared ]
+        set useprepared [$connection getUsePrepared]
         foreach token [::tdbc::tokenize $sqlcode] {
 
             # I have no idea how to get params meta here,
@@ -512,10 +526,11 @@ java::import java.io.StringReader
             } else {
                 set stmt [$ConnectionI createStatement]
             }
-        } catch {SQLException e} {
-            error "SQLException when prepareStatement/Statement execute"
+        } catch {SQLException ex} {
+            error "SQLException: [$ex toString]"
+        } catch {Exception ex} {
+            error "Exception: [$ex toString]"
         }
-
     }
 
     forward resultSetCreate ::tdbc::jdbc::resultset create
@@ -547,16 +562,15 @@ java::import java.io.StringReader
         if {$length < 2} {
             set cmd [lrange [info level 0] 0 end-[llength $args]]
             return -code error \
-            -errorcode {TDBC GENERAL_ERROR HY000 jdbc WRONGNUMARGS} \
-            "wrong # args...\""
+                -errorcode {TDBC GENERAL_ERROR HY000 jdbc WRONGNUMARGS} \
+                "wrong # args: should be \"$cmd param\""
         }
 
         set parameter [lindex $args 0]
-        if { [catch  {set value [dict get $Params $parameter]}] } {
-            set cmd [lrange [info level 0] 0 end-[llength $args]]
+        if { [catch {set value [dict get $Params $parameter]}] } {
             return -code error \
-            -errorcode {TDBC GENERAL_ERROR HY000 jdbc BADOPTION} \
-            "wrong param...\""
+                -errorcode {TDBC GENERAL_ERROR HY000 jdbc BADOPTION} \
+                "unknown parameter \"$parameter\""
         }
 
         set count 1
@@ -602,7 +616,6 @@ java::import java.io.StringReader
         return $useprepared
     }
 
-
 }
 
 
@@ -610,8 +623,8 @@ java::import java.io.StringReader
 #
 # tdbc::jdbc::resultset --
 #
-#	The class 'tdbc::jdbc::resultset' models the result set that is
-#	produced by executing a statement against a jdbc database.
+#       The class 'tdbc::jdbc::resultset' models the result set that is
+#       produced by executing a statement against a jdbc database.
 #
 #------------------------------------------------------------------------------
 
@@ -621,13 +634,13 @@ java::import java.io.StringReader
 
     variable -set {*}{
         -stmt -sql -sqltypes -ResultSetI -ResultSetMetaDataI -params -RowCount
-         -columns -columnCount -useprepared
+        -columns -columnCount -useprepared -TdbcHelper
     }
 
 
     constructor {statement args} {
         next
-    	set -stmt [$statement getStmthandle]
+        set -stmt [$statement getStmthandle]
         set -params  [$statement params]
         set -sql [$statement getSql]
         set -useprepared [$statement getUsePrepared]
@@ -636,6 +649,7 @@ java::import java.io.StringReader
         set -columns {}
         set -columnCount  0
         set -sqltypes {}
+        set -TdbcHelper {}
 
         if {[llength $args] == 0} {
 
@@ -646,7 +660,7 @@ java::import java.io.StringReader
             java::try {
                 foreach mykey $keylist {
 
-                    if {[info exists ::$mykey] == 1} {
+                    if {[info exists ::$mykey]} {
                         upvar 1 $mykey mykey1
                         set -sqltypes [dict get [dict get ${-params} $mykey] type]
 
@@ -677,7 +691,7 @@ java::import java.io.StringReader
                             }
                             clob {
                                 # only work for type 4 JDBC driver
-                                set myclob [java::new StringReader $mykey1 ]
+                                set myclob [java::new StringReader $mykey1]
                                 ${-stmt}  setCharacterStream $count $myclob
                             }
                             date {
@@ -704,7 +718,7 @@ java::import java.io.StringReader
                                 # Try to use UTF-8 encoding
                                 set charsetName [java::new String "UTF-8"]
                                 set jstring [java::new String $mykey1]
-                                set bytearray [java::new ByteArrayInputStream [$jstring getBytes $charsetName] ]
+                                set bytearray [java::new ByteArrayInputStream [$jstring getBytes $charsetName]]
                                 ${-stmt}  setBinaryStream $count $bytearray
                             }
                             default {
@@ -717,43 +731,43 @@ java::import java.io.StringReader
 
                         switch -exact -- ${-sqltypes} {
                             bit {
-                                set opt1 [java::field java.sql.Types BOOLEAN ]
+                                set opt1 [java::field java.sql.Types BOOLEAN]
                             }
                             tinyint {
-                                set opt1 [java::field java.sql.Types TINYINT ]
+                                set opt1 [java::field java.sql.Types TINYINT]
                             }
                             smallint {
-                                set opt1 [java::field java.sql.Types SMALLINT ]
+                                set opt1 [java::field java.sql.Types SMALLINT]
                             }
                             integer {
-                                set opt1 [java::field java.sql.Types INTEGER ]
+                                set opt1 [java::field java.sql.Types INTEGER]
                             }
                             bigint {
-                                set opt1 [java::field java.sql.Types BIGINT ]
+                                set opt1 [java::field java.sql.Types BIGINT]
                             }
                             real {
-                                set opt1 [java::field java.sql.Types FLOAT ]
+                                set opt1 [java::field java.sql.Types FLOAT]
                             }
                             float {
-                                set opt1 [java::field java.sql.Types FLOAT ]
+                                set opt1 [java::field java.sql.Types FLOAT]
                             }
                             double {
-                                set opt1 [java::field java.sql.Types DOUBLE ]
+                                set opt1 [java::field java.sql.Types DOUBLE]
                             }
                             char {
-                                set opt1 [java::field java.sql.Types CHAR ]
+                                set opt1 [java::field java.sql.Types CHAR]
                             }
                             varchar {
-                                set opt1 [java::field java.sql.Types VARCHAR ]
+                                set opt1 [java::field java.sql.Types VARCHAR]
                             }
                             longvarchar {
-                                set opt1 [java::field java.sql.Types LONGVARCHAR ]
+                                set opt1 [java::field java.sql.Types LONGVARCHAR]
                             }
                             clob {
-                                set opt1 [java::field java.sql.Types CLOB ]
+                                set opt1 [java::field java.sql.Types CLOB]
                             }
                             date {
-                                set opt1 [java::field java.sql.Types DATE ]
+                                set opt1 [java::field java.sql.Types DATE]
                             }
                             time {
                                 set opt1 [java::field java.sql.Types TIME]
@@ -792,20 +806,20 @@ java::import java.io.StringReader
                 }
 
                 if {${-useprepared}} {
-                    set result [ ${-stmt} execute ]
+                    set result [${-stmt} execute]
                 } else {
-                    set result [ ${-stmt} execute ${-sql} ]
+                    set result [${-stmt} execute ${-sql}]
                 }
-            } catch {SQLException e} {
-                error "SQLException when execute"
-            } catch {Exception e} {
-                error "Exception when execute"
+            } catch {SQLException ex} {
+                error "SQLException: [$ex toString]"
+            } catch {Exception ex} {
+                error "Exception: [$ex toString]"
             }
 
             if { $result != 0 } {
                 set -ResultSetI [${-stmt} getResultSet]
-                set -ResultSetMetaDataI [ ${-ResultSetI} getMetaData ]
-                set -columnCount [ ${-ResultSetMetaDataI} getColumnCount ]
+                set -ResultSetMetaDataI [${-ResultSetI} getMetaData]
+                set -columnCount [${-ResultSetMetaDataI} getColumnCount]
                 set -RowCount 0
             } else {
                 set -RowCount [${-stmt} getUpdateCount]
@@ -825,7 +839,7 @@ java::import java.io.StringReader
 
                 foreach mykey $keylist {
 
-                    if {[catch {set bound [dict get ${-paramDict} $mykey]}]==0} {
+                    if {![catch {set bound [dict get ${-paramDict} $mykey]}]} {
                         set -sqltypes [dict get [dict get ${-params} $mykey] type]
 
                         switch -exact -- ${-sqltypes} {
@@ -855,7 +869,7 @@ java::import java.io.StringReader
                             }
                             clob {
                                 # only work for type 4 JDBC driver
-                                set myclob [java::new StringReader $bound ]
+                                set myclob [java::new StringReader $bound]
                                 ${-stmt}  setCharacterStream $count $myclob
                             }
                             date {
@@ -882,7 +896,7 @@ java::import java.io.StringReader
                                 # Try to use UTF-8 encoding
                                 set charsetName [java::new String "UTF-8"]
                                 set jstring [java::new String $bound]
-                                set bytearray [java::new ByteArrayInputStream [$jstring getBytes $charsetName] ]
+                                set bytearray [java::new ByteArrayInputStream [$jstring getBytes $charsetName]]
                                 ${-stmt}  setBinaryStream $count $bytearray
                             }
                             default {
@@ -895,43 +909,43 @@ java::import java.io.StringReader
 
                         switch -exact -- ${-sqltypes} {
                             bit {
-                                set opt1 [java::field java.sql.Types BOOLEAN ]
+                                set opt1 [java::field java.sql.Types BOOLEAN]
                             }
                             tinyint {
-                                set opt1 [java::field java.sql.Types TINYINT ]
+                                set opt1 [java::field java.sql.Types TINYINT]
                             }
                             smallint {
-                                set opt1 [java::field java.sql.Types SMALLINT ]
+                                set opt1 [java::field java.sql.Types SMALLINT]
                             }
                             integer {
-                                set opt1 [java::field java.sql.Types INTEGER ]
+                                set opt1 [java::field java.sql.Types INTEGER]
                             }
                             bigint {
-                                set opt1 [java::field java.sql.Types BIGINT ]
+                                set opt1 [java::field java.sql.Types BIGINT]
                             }
                             real {
-                                set opt1 [java::field java.sql.Types FLOAT ]
+                                set opt1 [java::field java.sql.Types FLOAT]
                             }
                             float {
-                                set opt1 [java::field java.sql.Types FLOAT ]
+                                set opt1 [java::field java.sql.Types FLOAT]
                             }
                             double {
-                                set opt1 [java::field java.sql.Types DOUBLE ]
+                                set opt1 [java::field java.sql.Types DOUBLE]
                             }
                             char {
-                                set opt1 [java::field java.sql.Types CHAR ]
+                                set opt1 [java::field java.sql.Types CHAR]
                             }
                             varchar {
-                                set opt1 [java::field java.sql.Types VARCHAR ]
+                                set opt1 [java::field java.sql.Types VARCHAR]
                             }
                             longvarchar {
-                                set opt1 [java::field java.sql.Types LONGVARCHAR ]
+                                set opt1 [java::field java.sql.Types LONGVARCHAR]
                             }
                             clob {
-                                set opt1 [java::field java.sql.Types CLOB ]
+                                set opt1 [java::field java.sql.Types CLOB]
                             }
                             date {
-                                set opt1 [java::field java.sql.Types DATE ]
+                                set opt1 [java::field java.sql.Types DATE]
                             }
                             time {
                                 set opt1 [java::field java.sql.Types TIME]
@@ -970,31 +984,37 @@ java::import java.io.StringReader
                 }
 
                 if {${-useprepared}} {
-                    set result [ ${-stmt} execute ]
+                    set result [${-stmt} execute]
                 } else {
-                    set result [ ${-stmt} execute ${-sql} ]
+                    set result [${-stmt} execute ${-sql}]
                 }
-            } catch {SQLException e} {
-                error "SQLException when execute"
+            } catch {SQLException ex} {
+                error "SQLException: [$ex toString]"
             } catch {Exception e} {
-                error "Exception when execute"
+                error "Exception: [$ex toString]"
             }
 
-            if { $result != 0 } {
+            if {$result} {
                 set -ResultSetI [${-stmt} getResultSet]
-                set -ResultSetMetaDataI [ ${-ResultSetI} getMetaData ]
-                set -columnCount [ ${-ResultSetMetaDataI} getColumnCount ]
+                set -ResultSetMetaDataI [${-ResultSetI} getMetaData]
+                set -columnCount [${-ResultSetMetaDataI} getColumnCount]
                 set -RowCount 0
             } else {
                 set -RowCount [${-stmt} getUpdateCount]
             }
 
         } else {
+            set cmd [lrange [info level 0] 0 1]
             return -code error \
-            -errorcode [list TDBC GENERAL_ERROR HY000 \
+                -errorcode [list TDBC GENERAL_ERROR HY000 \
                     JDBC WRONGNUMARGS] \
-            "wrong # args: should be\
-                     [lrange [info level 0] 0 1] statement ?dictionary?"
+                "wrong # args: should be \"$cmd statement ?dictionary?\""
+        }
+
+        if {[catch {
+            set -TdbcHelper [java::new tcl.lang.TdbcHelper ${-ResultSetI}]
+        }]} {
+            set -TdbcHelper {}
         }
     }
 
@@ -1004,9 +1024,17 @@ java::import java.io.StringReader
         variable columnName
 
         set -columns {}
+
+        if {${-TdbcHelper} ne {}} {
+            foreach columnObj [java::listify [${-TdbcHelper} getColumns]] {
+                lappend -columns $columnObj
+            }
+            return ${-columns}
+        }
+
         set i 1
         while { $i <= ${-columnCount} } {
-            set columnName [ ${-ResultSetMetaDataI} getColumnLabel $i ]
+            set columnName [${-ResultSetMetaDataI} getColumnLabel $i]
             lappend -columns $columnName
             incr i
         }
@@ -1018,7 +1046,7 @@ java::import java.io.StringReader
     method nextresults {} {
         set have 0
 
-        if { [catch {set have [ ${-ResultSetMetaDataI} isAfterLast ] } ] } {
+        if {[catch {set have [${-ResultSetMetaDataI} isAfterLast]}]} {
             set have 0
         }
 
@@ -1031,23 +1059,32 @@ java::import java.io.StringReader
         set row {}
         set i 1
 
-        if { [ ${-ResultSetI} next ] == 1 } {
+        if {[${-ResultSetI} next]} {
+
+            if {${-TdbcHelper} ne {}} {
+                foreach value [java::listify [${-TdbcHelper} getRowData]] {
+                    lappend row $value
+                }
+                return 1
+            }
+
             while { $i <= ${-columnCount} } {
-                set columnName [ ${-ResultSetMetaDataI} getColumnLabel $i ]
-                set columnType [ ${-ResultSetMetaDataI} getColumnTypeName $i ]
+                set columnName [${-ResultSetMetaDataI} getColumnLabel $i]
+                set columnType [${-ResultSetMetaDataI} getColumnTypeName $i]
 
                 # Add BLOB handle
                 set columnType [string tolower $columnType]
-                if {$columnType in {"blob" "binary" "varbinary" "longvarbinary" "bytea" "raw" "longraw" "image"}} {
+                if {$columnType in {blob binary varbinary
+                        longvarbinary bytea raw longraw image}} {
                     set charsetName [java::new String "UTF-8"]
                     set mybytes [${-ResultSetI} getBytes $columnName]
                     set jstring [java::new String $mybytes $charsetName]
                     set value [$jstring toString]
                 } else {
-                    set value [ ${-ResultSetI} getString $columnName ]
+                    set value [${-ResultSetI} getString $columnName]
                 }
 
-                if { [ ${-ResultSetI} wasNull] } {
+                if {[${-ResultSetI} wasNull]} {
                     lappend row ""
                 } else {
                     lappend row $value
@@ -1070,23 +1107,37 @@ java::import java.io.StringReader
 
         set row [dict create]
 
-        if { [  ${-ResultSetI} next ] == 1 } {
+        if {[${-ResultSetI} next]} {
+ 
+            if {${-TdbcHelper} ne {}} {
+                if {${-columns} eq {}} {
+                    foreach columnObj [java::listify [${-TdbcHelper} getColumns]] {
+                        lappend -columns $columnObj
+                    }
+                }
+                foreach column ${-columns} value [java::listify [${-TdbcHelper} getRowData]] {
+                    dict set row $column $value
+                }
+                return 1
+            }
+
             while { $i <= ${-columnCount} } {
-                set columnName [ ${-ResultSetMetaDataI} getColumnLabel $i ]
-                set columnType [ ${-ResultSetMetaDataI} getColumnTypeName $i ]
+                set columnName [${-ResultSetMetaDataI} getColumnLabel $i]
+                set columnType [${-ResultSetMetaDataI} getColumnTypeName $i]
 
                 # Add BLOB handle
                 set columnType [string tolower $columnType]
-                if {$columnType in {"blob" "binary" "varbinary" "longvarbinary" "bytea" "raw" "longraw" "image"}} {
+                if {$columnType in {blob binary varbinary
+                        longvarbinary bytea raw longraw image}} {
                     set charsetName [java::new String "UTF-8"]
                     set mybytes [${-ResultSetI} getBytes $columnName]
                     set jstring [java::new String $mybytes $charsetName]
                     set value [$jstring toString]
                 } else {
-                    set value [ ${-ResultSetI} getString $columnName ]
+                    set value [${-ResultSetI} getString $columnName]
                 }
 
-                if {[ ${-ResultSetI} wasNull] == 0} {
+                if {![${-ResultSetI} wasNull]} {
                     dict set row $columnName $value
                 }
 
@@ -1105,3 +1156,4 @@ java::import java.io.StringReader
         return ${-RowCount}
     }
 }
+
