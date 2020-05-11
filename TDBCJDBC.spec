@@ -4,7 +4,7 @@
 
 Name:           TDBCJDBC
 BuildRequires:  tcl
-Version:        0.1.1
+Version:        0.2.0
 Release:        0
 Summary:        Tcl DataBase Connectivity JDBC Driver
 Url:            https://github.com/ray2501/TDBCJDBC
@@ -33,8 +33,8 @@ cat > %{buildroot}%{tcl_noarchdir}/%{name}%{version}/pkgIndex.tcl << 'EOD'
 #
 # Tcl package index file
 #
-package ifneeded tdbc::jdbc 0.1.1 \
-    [list source [file join $dir tdbc jdbc-0.1.1.tm]]
+package ifneeded tdbc::jdbc 0.2.0 \
+    [list source [file join $dir tdbc jdbc-0.2.0.tm]]
 EOD
 
 %clean

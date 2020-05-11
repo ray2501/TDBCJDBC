@@ -23,7 +23,7 @@ if { [info exists ::env(TCLLIBPATH) ] } {
     }
 }
 
-package provide tdbc::jdbc 0.1.1
+package provide tdbc::jdbc 0.2.0
 
 
 ::namespace eval ::tdbc::jdbc {

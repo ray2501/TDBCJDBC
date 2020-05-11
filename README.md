@@ -42,15 +42,15 @@ Installation
 The tdbc::jdbc driver requires Tcl >= 8.6, TDBC and tclBlend package.
 
 For Windows platform, if your Tcl lib folder is `C:\Tcl\lib`,
-then copy jdbc-0.1.1.tm this file to below location:
+then copy jdbc-0.2.0.tm this file to below location:
 
     C:\Tcl\lib\tcl8\8.6\tdbc
 
-For Ubuntu, copy jdbc-0.1.1.tm this file to below location:
+For Ubuntu, copy jdbc-0.2.0.tm this file to below location:
 
     /usr/share/tcltk/tcl8/8.6/tdbc
 
-For openSUSE (64bit), copy jdbc-0.1.1.tm this file to below location:
+For openSUSE (64bit), copy jdbc-0.2.0.tm this file to below location:
 
     /usr/lib64/tcl/tcl8/8.6/tdbc
 

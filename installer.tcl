@@ -15,7 +15,7 @@ if {[catch {package require tdbc} errMsg]} {
 
 # Use info library to get the library path, setup default value
 set path [file normalize [info library]/../tcl8/8.6/tdbc]
-set tmfile jdbc-0.1.1.tm
+set tmfile jdbc-0.2.0.tm
 set uninstall 0
 
 if {$argc > 0 && [llength $argv] % 2 eq 0} {
