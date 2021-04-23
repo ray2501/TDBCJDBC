@@ -324,7 +324,7 @@ Download JDBC driver from [PostgreSQL JDBC Driver](https://jdbc.postgresql.org/i
 ## Example: MonetDB
 
 This example is only to test MonetDB
-[JDBC driver](https://www.monetdb.org/Documentation/Manuals/SQLreference/Programming/JDBC).
+[JDBC driver](https://www.monetdb.org/Documentation/SQLreference/Programming/JDBC).
 
 Below is an exmaple:
 
@@ -388,7 +388,7 @@ Below is an exmaple:
 
 ## Example: SQLite
 
-SQLite already have very good [Tcl interface](https://www.sqlite.org/tclsqlite.html) and [TDBC driver](http://www.tcl.tk/man/tcl8.6/TdbcsqliteCmd/tdbc_sqlite3.htm). This example is only to test [SQLite JDBC driver](https://bitbucket.org/xerial/sqlite-jdbc).
+SQLite already have very good [Tcl interface](https://www.sqlite.org/tclsqlite.html) and [TDBC driver](http://www.tcl.tk/man/tcl8.6/TdbcsqliteCmd/tdbc_sqlite3.htm). This example is only to test [SQLite JDBC driver](https://github.com/xerial/sqlite-jdbc).
 
 Below is an exmaple:
 
