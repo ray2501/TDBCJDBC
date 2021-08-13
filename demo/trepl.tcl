@@ -49,22 +49,20 @@ while {1} {
                 set statement [db prepare $query]
                 set resultset [$statement execute]
 
+                puts ""
                 set columns [$resultset columns]
                 if {[llength $columns] != 0} {
                     set result [list]
-                    set columnlist [list]
-                    foreach c $columns {
-                        lappend columnlist $c
-                    }
-
-                    lappend result $columnlist
+                    lappend result $columns
 
                     $resultset foreach -as lists row {
                          lappend result $row
                     }
 
-                    puts ""
                     puts [::tabulate::tabulate -data $result]
+                } else {
+                    set rowcount [$resultset rowcount]
+                    puts "$rowcount of rows in the database that were affected."
                 }
 
                 $resultset close
