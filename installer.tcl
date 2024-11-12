@@ -3,7 +3,7 @@
 # It is a very simple installer for TDBCJDBC package
 #
 
-if {[catch {package require Tcl 8.6} errMsg]} {
+if {[catch {package require Tcl 8.6-} errMsg]} {
   puts $errMsg
   exit
 }
