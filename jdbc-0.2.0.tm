@@ -10,16 +10,18 @@ package require tdbc
 
 # jtclsh will setup TCLLIBPATH
 if { [info exists ::env(TCLLIBPATH) ] } {
+    # Add a workaround for OpenJDK 25 (JEP 472)
+    set tclblend_init {--enable-native-access=ALL-UNNAMED}
     if {[catch {package require java}]} {
         puts "Failed loading package TclBlend..."
-	exit
+        exit
     }
 } else {
     # Environment variable does not find TCLLIBPATH -> no TclBlend/jtclsh
     # Now try to check TclJBlend
     if {[catch {package require JBlend}]} {
         puts "Failed loading package TclJBlend, exit."
-	exit
+        exit
     }
 }
 
